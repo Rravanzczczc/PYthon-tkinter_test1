@@ -1,2 +1,1 @@
-{'name': 'tt', 'math': '111', 'chinese': '111', 'english': '111'}
-{'name': 'zz', 'math': '111', 'chinese': '111', 'english': '111'}
+{'name': 'www', 'math': '111', 'chinese': '111', 'english': '111'}

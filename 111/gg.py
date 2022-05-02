@@ -2,7 +2,6 @@ import tkinter
 import os
 from tkinter import ttk
 filename = 'student.txt'
-
 class LoginPage:
     def __init__(self, root2):
 
@@ -24,8 +23,9 @@ class LoginPage:
 
         #self.root.mainloop()
     def creat_page(self):
+        photo = tkinter.PhotoImage("sky.jpg")
         # 建立一个规范格式（美观）
-        tkinter.Label(self.login_frame, width=15).grid(row=0, column=0)
+        tkinter.Label(self.login_frame, width=15, image=photo).grid(row=0, column=0)
 
 
 
@@ -56,6 +56,7 @@ class MainPage:
         self.root.title('信息管理系统')
         self.root.geometry('600x400')
 
+
         self.creat_page()
 
 
@@ -65,9 +66,6 @@ class MainPage:
 
         self.search_frame = searchFrame(self.root)
         #self.select_frame.pack()
-
-        self.about_frame = aboutFrame(self.root)
-        #self.about_frame.pack()
 
         self.change_frame = changeFrame(self.root)
         # self.change_frame.pack()
@@ -83,45 +81,33 @@ class MainPage:
         menu_bar.add_command(label='查询', command=self.show_search_frame)
         menu_bar.add_command(label='删除', command=self.show_delete_frame)
         menu_bar.add_command(label='修改', command=self.show_change_frame)
-        menu_bar.add_command(label='关于', command=self.show_about_frame)
 
         self.root['menu'] = menu_bar
 
     def show_insert_frame(self):
         self.insert_frame.pack()
         self.search_frame.forget()
-        self.about_frame.forget()
         self.change_frame.forget()
         self.delete_frame.forget()
 
     def show_search_frame(self):
         self.insert_frame.forget()
         self.search_frame.pack()
-        self.about_frame.forget()
         self.change_frame.forget()
         self.delete_frame.forget()
 
-    def show_about_frame(self):
-        self.insert_frame.forget()
-        self.search_frame.forget()
-        self.about_frame.pack()
-        self.change_frame.forget()
-        self.delete_frame.forget()
 
     def show_change_frame(self):
         self.insert_frame.forget()
         self.search_frame.forget()
-        self.about_frame.forget()
         self.change_frame.pack()
         self.delete_frame.forget()
 
     def show_delete_frame(self):
         self.insert_frame.forget()
         self.search_frame.forget()
-        self.about_frame.forget()
         self.change_frame.forget()
         self.delete_frame.pack()
-
 
 #插入页面
 class insertFrame(tkinter.Frame):
@@ -137,7 +123,8 @@ class insertFrame(tkinter.Frame):
         self.create_page()
 
     def create_page(self):
-        tkinter.Label(self, width=15).grid(row=0, column=0, padx=5, pady=5)
+        photo = tkinter.PhotoImage("sky.jpg")
+        tkinter.Label(self, width=15, image=photo).grid(row=0, column=0, padx=5, pady=5)
 
         tkinter.Label(self, text='姓名').grid(row=1, column=0, padx=5, pady=5)
         tkinter.Entry(self, textvariable=self.username).grid(row=1, column=1, padx=5, pady=5)
@@ -223,7 +210,6 @@ class searchFrame(tkinter.Frame):
 
         return student_list
 
-
 class changeFrame(tkinter.Frame):
     def __init__(self, root):
         super().__init__(master=root)
@@ -255,13 +241,42 @@ class changeFrame(tkinter.Frame):
         tkinter.Button(self, text='查询', command=self.search_user).grid(row=6, column=1)
         tkinter.Label(self, textvariable=self.status).grid(row=6, column=1)
     def search_user(self):
-        pass
+        student_id = self.username.get()
+        if student_id != '':
+            # 判断文件是否存在，读取数据
+            if os.path.exists(filename):
+                with open(filename, 'r', encoding='UTF-8') as file:
+                    student_infos = file.readlines()
+            # 标记是否删除
+                for item in student_infos:
+                    # eval用来执行字符串表达式，dict进行字符串转字典
+                    info = dict(eval(item))
+                    # 查询出来的值 不等于给定删除的值，则进行覆盖写
+                    if info['name'] == student_id:
+                        self.math.set(info['math'])
+                        self.username.set(info['name'])
+                        self.english.set(info['english'])
+                        self.chinese.set(info['chinese'])
 
 
     def change_user(self):
-        pass
+        if os.path.exists(filename):
+            with open(filename, 'r', encoding='UTF-8') as r_file:
+                student_infos = r_file.readlines()
+        else:
+            return
 
-
+        student_id = self.username.get()
+        with open(filename, 'w', encoding='UTF-8') as w_file:
+            for item in student_infos:
+                info = dict(eval(item))
+                if info['name'] == student_id:
+                    info['chinese'] = self.chinese.get()
+                    info['english'] = self.english.get()
+                    info['math'] = self.math.get()
+                    w_file.write(str(info) + '\n')
+                else:
+                    w_file.write(str(info) + '\n')
 
 class deleteFrame(tkinter.Frame):
     def __init__(self, root):
@@ -304,18 +319,10 @@ class deleteFrame(tkinter.Frame):
 
 
 
-class aboutFrame(tkinter.Frame):
-    def __init__(self, root):
-        super().__init__(master=root)
-        tkinter.Label(self, text='关于').pack()
-        tkinter.Label(self, text='关于').pack()
-        tkinter.Label(self, text='关于').pack()
-        tkinter.Label(self, text='关于').pack()
 
 
 root = tkinter.Tk()
 
-#login_Page = LoginPage(root)
-MainPage(root)
+login_Page = LoginPage(root)
 
 root.mainloop()
