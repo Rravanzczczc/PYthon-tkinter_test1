@@ -191,9 +191,9 @@ def delete():
             show()
         answer = input('是否继续删除？ Y/N: \n')
         if answer == 'Y' or answer == 'y':
-            continue
-        else:
-            break
+                    continue
+                else:
+                    break
 
 
 # 修改学生信息
@@ -204,11 +204,10 @@ def modify():
     else:
         return
     student_id = input('请输入想要修改的学生ID：')
-    with open(filename, 'w', encoding='UTF-8') as w_file:
-        a = 0
-        for item in student_infos:
-            info = dict(eval(item))
-            if info['id'] == student_id:
+    a = 0
+    for item in student_infos:
+        info = dict(eval(item))
+        if info['id'] == student_id:
                 print('找到指定学生信息，可以进行修改')
                 while True:
                     try:

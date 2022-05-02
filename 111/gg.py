@@ -69,14 +69,20 @@ class MainPage:
         self.about_frame = aboutFrame(self.root)
         #self.about_frame.pack()
 
+        self.change_frame = changeFrame(self.root)
+        # self.change_frame.pack()
+
+        self.delete_frame = deleteFrame(self.root)
+        # self.delete_frame.pack()
+
 
     def creat_page(self):
         menu_bar = tkinter.Menu(self.root)
 
         menu_bar.add_command(label='录入', command=self.show_insert_frame)
         menu_bar.add_command(label='查询', command=self.show_search_frame)
-        menu_bar.add_command(label='删除')
-        menu_bar.add_command(label='修改')
+        menu_bar.add_command(label='删除', command=self.show_delete_frame)
+        menu_bar.add_command(label='修改', command=self.show_change_frame)
         menu_bar.add_command(label='关于', command=self.show_about_frame)
 
         self.root['menu'] = menu_bar
@@ -85,17 +91,36 @@ class MainPage:
         self.insert_frame.pack()
         self.search_frame.forget()
         self.about_frame.forget()
+        self.change_frame.forget()
+        self.delete_frame.forget()
 
     def show_search_frame(self):
         self.insert_frame.forget()
         self.search_frame.pack()
         self.about_frame.forget()
+        self.change_frame.forget()
+        self.delete_frame.forget()
 
     def show_about_frame(self):
         self.insert_frame.forget()
         self.search_frame.forget()
         self.about_frame.pack()
+        self.change_frame.forget()
+        self.delete_frame.forget()
 
+    def show_change_frame(self):
+        self.insert_frame.forget()
+        self.search_frame.forget()
+        self.about_frame.forget()
+        self.change_frame.pack()
+        self.delete_frame.forget()
+
+    def show_delete_frame(self):
+        self.insert_frame.forget()
+        self.search_frame.forget()
+        self.about_frame.forget()
+        self.change_frame.forget()
+        self.delete_frame.pack()
 
 
 #插入页面
@@ -199,7 +224,83 @@ class searchFrame(tkinter.Frame):
         return student_list
 
 
+class changeFrame(tkinter.Frame):
+    def __init__(self, root):
+        super().__init__(master=root)
+        self.username = tkinter.StringVar()
+        self.math = tkinter.StringVar()
+        self.chinese = tkinter.StringVar()
+        self.english = tkinter.StringVar()
+        self.id = tkinter.StringVar()
+        self.status = tkinter.StringVar()
 
+        self.create_page()
+    def create_page(self):
+        tkinter.Label(self, width=15).grid(row=0, column=0, padx=5, pady=5)
+
+        tkinter.Label(self, text='姓名').grid(row=1, column=0, padx=5, pady=5)
+        tkinter.Entry(self, textvariable=self.username).grid(row=1, column=1, padx=5, pady=5)
+
+        tkinter.Label(self, text='数学').grid(row=2, column=0, padx=5, pady=5)
+        tkinter.Entry(self, textvariable=self.math).grid(row=2, column=1, padx=5, pady=5)
+
+        tkinter.Label(self, text='语文').grid(row=3, column=0, padx=5, pady=5)
+        tkinter.Entry(self, textvariable=self.chinese).grid(row=3, column=1, padx=5, pady=5)
+
+        tkinter.Label(self, text='英语').grid(row=4, column=0, padx=5, pady=5)
+        tkinter.Entry(self, textvariable=self.english).grid(row=4, column=1, padx=5, pady=5)
+
+
+        tkinter.Button(self, text='修改', command=self.change_user).grid(row=6, column=0)
+        tkinter.Button(self, text='查询', command=self.search_user).grid(row=6, column=1)
+        tkinter.Label(self, textvariable=self.status).grid(row=6, column=1)
+    def search_user(self):
+        pass
+
+
+    def change_user(self):
+        pass
+
+
+
+class deleteFrame(tkinter.Frame):
+    def __init__(self, root):
+        super().__init__(master=root)
+        self.username = tkinter.StringVar()
+        self.status = tkinter.StringVar()
+        tkinter.Label(self, text='根据名字删除信息').pack()
+        tkinter.Entry(self, textvariable=self.username).pack()
+        tkinter.Button(self, text='删除', command=self.delete).pack()
+        tkinter.Label(self, text=self.status).pack()
+
+    def delete(self):
+        student_id = self.username.get()
+        if student_id != '':
+            # 判断文件是否存在，读取数据
+            if os.path.exists(filename):
+                with open(filename, 'r', encoding='UTF-8') as file:
+                    student_infos = file.readlines()
+            else:
+                student_infos = []
+            # 标记是否删除
+            flag = False
+
+            # 判断读取的内容是否为空
+            if student_infos:
+                with open(filename, 'w', encoding='UTF-8') as w_file:
+                    info = {}
+                    for item in student_infos:
+                        # eval用来执行字符串表达式，dict进行字符串转字典
+                        info = dict(eval(item))
+                        # 查询出来的值 不等于给定删除的值，则进行覆盖写
+                        if info['name'] != student_id:
+                            w_file.write(str(info) + '\n')
+                        else:
+                            flag = True
+                    if flag:
+                        print(f'id为{student_id}的学生已被删除')
+                    else:
+                        print(f'没有找到ID为{student_id}的学生')
 
 
 
