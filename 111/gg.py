@@ -46,14 +46,53 @@ class LoginPage:
             print('success')
             self.login_frame.destroy()
             MainPage(self.root)
+        elif self.username.get() == 'student1' and self.password.get() == '456456':
+            print('success')
+            self.login_frame.destroy()
+            MainPage2(self.root)
+        elif self.username.get() == 'student2' and self.password.get() == '456456':
+            print('success')
+            self.login_frame.destroy()
+            MainPage2(self.root)
+        elif self.username.get() == 'student3' and self.password.get() == '456456':
+            print('success')
+            self.login_frame.destroy()
+            MainPage2(self.root)
+
+
         else:
             print('false')
 
+class MainPage2:
+    def __init__(self, root2):
+        self.root = root2
+        self.root.title('成绩管理系统：学生权限')
+        self.root.geometry('600x400')
+
+        self.creat_page()
+
+
+        self.search_frame = searchFrame(self.root)
+        #self.select_frame.pack()
+
+
+
+    def creat_page(self):
+        menu_bar = tkinter.Menu(self.root)
+
+        menu_bar.add_command(label='查询', command=self.show_search_frame)
+
+
+
+        self.root['menu'] = menu_bar
+
+    def show_search_frame(self):
+        self.search_frame.pack()
 
 class MainPage:
     def __init__(self, root2):
         self.root = root2
-        self.root.title('信息管理系统')
+        self.root.title('成绩管理系统：管理员权限')
         self.root.geometry('600x400')
 
 
@@ -73,6 +112,10 @@ class MainPage:
         self.delete_frame = deleteFrame(self.root)
         # self.delete_frame.pack()
 
+        self.tongji = tongji(self.root)
+
+
+
 
     def creat_page(self):
         menu_bar = tkinter.Menu(self.root)
@@ -81,6 +124,8 @@ class MainPage:
         menu_bar.add_command(label='查询', command=self.show_search_frame)
         menu_bar.add_command(label='删除', command=self.show_delete_frame)
         menu_bar.add_command(label='修改', command=self.show_change_frame)
+        menu_bar.add_command(label='统计', command=self.show_tongji_frame)
+
 
         self.root['menu'] = menu_bar
 
@@ -89,12 +134,16 @@ class MainPage:
         self.search_frame.forget()
         self.change_frame.forget()
         self.delete_frame.forget()
+        self.tongji.forget()
+
 
     def show_search_frame(self):
         self.insert_frame.forget()
         self.search_frame.pack()
         self.change_frame.forget()
         self.delete_frame.forget()
+        self.tongji.forget()
+
 
 
     def show_change_frame(self):
@@ -102,12 +151,22 @@ class MainPage:
         self.search_frame.forget()
         self.change_frame.pack()
         self.delete_frame.forget()
+        self.tongji.forget()
 
     def show_delete_frame(self):
         self.insert_frame.forget()
         self.search_frame.forget()
         self.change_frame.forget()
         self.delete_frame.pack()
+        self.tongji.forget()
+
+    def show_tongji_frame(self):
+        self.insert_frame.forget()
+        self.search_frame.forget()
+        self.change_frame.forget()
+        self.delete_frame.forget()
+        self.tongji.pack()
+
 
 #插入页面
 class insertFrame(tkinter.Frame):
@@ -140,7 +199,7 @@ class insertFrame(tkinter.Frame):
 
 
         tkinter.Button(self, text='录入', command=self.recode).grid(row=6, column=1)
-        tkinter.Label(self, textvariable=self.status).grid(row=6, column=1)
+
 
 
     def recode(self):
@@ -167,7 +226,17 @@ class searchFrame(tkinter.Frame):
     def __init__(self, root):
         super().__init__(master=root)
 
+        with open(filename, 'r', encoding='UTF-8') as r_file:
+            student_infos = r_file.readlines()
+            self.status1 = (len(student_infos))
+
         self.creat_page()
+        self.status1 = tkinter.StringVar()
+        self.status2 = tkinter.StringVar()
+        self.status3 = tkinter.StringVar()
+        self.status4 = tkinter.StringVar()
+
+
 
 
     def creat_page(self):
@@ -186,9 +255,14 @@ class searchFrame(tkinter.Frame):
         self.show_data_frame()
 
         tkinter.Button(self, text="刷新", command=self.show_data_frame).pack()
+        tkinter.Button(self, text="清除数据", command=self.clear_all).pack()
+        tkinter.Button(self, text="默认:数学降次", command=self.treeview_sort_column(self.tree_view,'math',True)).pack()
 
+        tkinter.Button(self, text="默认:英语降次", command=self.treeview_sort_column(self.tree_view,'english',True)).pack()
+        tkinter.Button(self, text="默认:语文降次", command=self.joke()).pack()
 
     def show_data_frame(self):
+
 
         for _ in map(self.tree_view.delete, self.tree_view.get_children()):
             pass
@@ -200,6 +274,10 @@ class searchFrame(tkinter.Frame):
                 stu['name'], stu['math'], stu['chinese'], stu['english'],
             ))
 
+    def joke(self):
+        pass
+
+
     def get_list(self):
         student_list = []
         if os.path.exists(filename):
@@ -209,6 +287,18 @@ class searchFrame(tkinter.Frame):
                     student_list.append(eval(item))
 
         return student_list
+
+    def clear_all(self):
+        file = open(filename, 'w').close()
+
+    def treeview_sort_column(self, tv, col, reverse):
+        l = [(tv.set(k, col), k) for k in tv.get_children('')]
+        l.sort(key=lambda t: int(t[0]), reverse=reverse)
+        for index, (val, k) in enumerate(l):
+            tv.move(k, '', index)
+
+        tv.heading(col, command=lambda: tv.treeview_sort_column(tv, col, not reverse))
+
 
 class changeFrame(tkinter.Frame):
     def __init__(self, root):
@@ -286,7 +376,6 @@ class deleteFrame(tkinter.Frame):
         tkinter.Label(self, text='根据名字删除信息').pack()
         tkinter.Entry(self, textvariable=self.username).pack()
         tkinter.Button(self, text='删除', command=self.delete).pack()
-        tkinter.Label(self, text=self.status).pack()
 
     def delete(self):
         student_id = self.username.get()
@@ -316,6 +405,68 @@ class deleteFrame(tkinter.Frame):
                         print(f'id为{student_id}的学生已被删除')
                     else:
                         print(f'没有找到ID为{student_id}的学生')
+
+
+
+class tongji(tkinter.Frame):
+    def __init__(self, root):
+        super().__init__(master=root)
+        self.math = tkinter.StringVar()
+        self.chinese = tkinter.StringVar()
+        self.english = tkinter.StringVar()
+        self.username = tkinter.StringVar()
+        self.status = tkinter.StringVar()
+
+        self.create_page()
+    def create_page(self):
+        tkinter.Label(self, width=15).grid(row=0, column=0, padx=5, pady=5)
+
+        tkinter.Label(self, text='平均分').grid(row=1, column=0, padx=5, pady=5)
+        tkinter.Entry(self, textvariable=self.username).grid(row=1, column=1, padx=5, pady=5)
+
+        tkinter.Label(self, text='数学平均分').grid(row=2, column=0, padx=5, pady=5)
+        tkinter.Entry(self, textvariable=self.math).grid(row=2, column=1, padx=5, pady=5)
+
+        tkinter.Label(self, text='语文平均分').grid(row=3, column=0, padx=5, pady=5)
+        tkinter.Entry(self, textvariable=self.chinese).grid(row=3, column=1, padx=5, pady=5)
+
+        tkinter.Label(self, text='英语平均分').grid(row=4, column=0, padx=5, pady=5)
+        tkinter.Entry(self, textvariable=self.english).grid(row=4, column=1, padx=5, pady=5)
+
+
+        tkinter.Button(self, text='查询', command=self.search_user).grid(row=6, column=0)
+        tkinter.Label(self, textvariable=self.status).grid(row=6, column=1)
+    def search_user(self):
+            tmath = 0
+            tchinese = 0
+            tenglish = 0
+            ttotal = 0
+            length = 0
+            qurry = []
+            if os.path.exists(filename):
+                with open(filename, 'r', encoding='UTF-8') as file:
+                    student_infos = file.readlines()
+            # 标记是否删除
+                for item in student_infos:
+                    info = dict(eval(item))
+                    qurry.append(info)
+                for item in qurry:
+                    tmath = tmath + int(item['math'])
+                    tenglish = tenglish + int(item['math'])
+                    tchinese = tchinese + int(item['chinese'])
+                    ttotal = ttotal + int(item['math']) + int(item['math']) + int(item['chinese'])
+                    length = length+1
+
+                tmath = tmath/length
+                tchinese = tchinese/length
+                tenglish = tenglish/length
+                ttotal = ttotal/length
+
+
+                self.math.set(tmath)
+                self.username.set(ttotal)
+                self.english.set(tenglish)
+                self.chinese.set(tchinese)
 
 
 
